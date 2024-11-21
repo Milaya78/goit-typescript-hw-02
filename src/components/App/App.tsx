@@ -1,5 +1,5 @@
 import css from "./App.module.css";
-import fetchImages from "../../js/unsplash-api";
+import fetchImages, { Image } from "../../services/unsplash-api";
 import { useState, useEffect } from "react";
 import ImageGallery from "../ImageGallery/ImageGallery";
 import SearchBar from "../SearchBar/SearchBar";
@@ -8,18 +8,19 @@ import Loader from "../Loader/Loader";
 import ImageModal from "../ImageModal/ImageModal";
 import LoadMoreBtn from "../LoadMoreBtn/LoadMoreBtn";
 import ErrorMessage from "../ErrorMessage/ErrorMessage";
+import { AxiosError } from "axios";
 
 function App() {
-  const [images, setImages] = useState([]);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(false);
-  const [errorMessage, setErrorMessage] = useState("");
-  const [query, setQuery] = useState("");
-  const [page, setPage] = useState(1);
-  const [isLastPage, setIsLastPage] = useState(false);
-  const [modalIsOpen, setModalIsOpen] = useState(false);
-  const [modalImage, setModalImage] = useState("");
-  const [modalAlt, setModalAlt] = useState("");
+  const [images, setImages] = useState<Image[]>([]);
+  const [loading, setLoading] = useState<boolean>(false);
+  const [error, setError] = useState<boolean>(false);
+  const [errorMessage, setErrorMessage] = useState<string>("");
+  const [query, setQuery] = useState<string>("");
+  const [page, setPage] = useState<number>(1);
+  const [isLastPage, setIsLastPage] = useState<boolean>(false);
+  const [modalIsOpen, setModalIsOpen] = useState<boolean>(false);
+  const [modalImage, setModalImage] = useState<string>("");
+  const [modalAlt, setModalAlt] = useState<string>("");
 
   useEffect(() => {
     async function fetchImagesHandler() {
@@ -45,9 +46,11 @@ function App() {
         setIsLastPage(page >= data.total_pages);
         setImages((prevData) => [...prevData, ...results]);
       } catch (error) {
-        setError(true);
-        setErrorMessage(error.message);
-        toast.error(error.message, { position: "top-right", duration: 4000 });
+        if (error instanceof AxiosError) {
+          setError(true);
+          setErrorMessage(error.message);
+          toast.error(error.message, { position: "top-right", duration: 4000 });
+        }
       } finally {
         setLoading(false);
       }
@@ -76,7 +79,7 @@ function App() {
     setPage((prevData) => prevData + 1);
   }
 
-  function openModal(imageUrl, alt) {
+  function openModal(imageUrl: string, alt: string) {
     setModalIsOpen(true);
     setModalImage(imageUrl);
     setModalAlt(alt);
@@ -85,11 +88,13 @@ function App() {
   function closeModal() {
     setModalIsOpen(false);
   }
-
+  function onSetQuery(searchQuery: string) {
+    setQuery(searchQuery);
+  }
   return (
     <div className={css.container}>
       <Toaster />
-      <SearchBar reset={onSubmitReset} setQuery={setQuery} />
+      <SearchBar reset={onSubmitReset} setQuery={onSetQuery} />
       {error ? (
         <ErrorMessage errorMessage={errorMessage} />
       ) : (

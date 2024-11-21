@@ -4,12 +4,19 @@ import css from "./ImageModal.module.css";
 
 Modal.setAppElement("#root");
 
+type Props = {
+  modalIsOpen: boolean;
+  closeModal: () => void;
+  modalImage: string;
+  modalAlt: string;
+};
+
 export default function ImageModal({
   modalIsOpen,
   closeModal,
   modalImage,
   modalAlt,
-}) {
+ }:Props) {
   return (
     <Modal
       isOpen={modalIsOpen}

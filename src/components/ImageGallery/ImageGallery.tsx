@@ -1,7 +1,12 @@
+import { Image } from "../../services/unsplash-api";
 import ImageCard from "../ImageCard/ImageCard";
 import css from "./ImageGallery.module.css";
 
-export default function ImageGallery({ images, onModalOpen }) {
+type Props = {
+  images: Image[];
+  onModalOpen: (imgUrl: string, alt: string) => void;
+};
+export default function ImageGallery({ images, onModalOpen }: Props) {
   return (
     <div className={css.container}>
       <ul className={css.gallery}>
